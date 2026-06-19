@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Producers Guild | Awards Analysis | Zack Russell</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f0e; --bg2: #131614; --bg3: #1a1d1b;
+  --teal: #3ecfb2; --teal-dim: #1f6b5e; --teal-glow: rgba(62,207,178,0.12);
+  --text: #e8ede9; --muted: #7a8c82; --border: #242924; --accent: #f0c96e;
+  --red: #e07070;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 3rem;display:flex;justify-content:space-between;align-items:center;background:rgba(13,15,14,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--teal);letter-spacing:0.1em;text-decoration:none;}
+.nav-links{display:flex;gap:1.5rem;list-style:none;flex-wrap:wrap;}
+.nav-links a{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;transition:color 0.2s;padding:0.25rem 0.5rem;border:1px solid transparent;}
+.nav-links a:hover{color:var(--teal);}
+.nav-links a.active{color:var(--teal);border-color:var(--teal-dim);}
+.page{padding:7rem 4rem 4rem;max-width:1200px;margin:0 auto;}
+.eyebrow{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.6rem;}
+.eyebrow::before{content:'';display:block;width:1.5rem;height:1px;background:var(--teal);}
+h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4.5vw,3.5rem);line-height:1.1;margin-bottom:1.25rem;}
+h1 em{font-style:italic;}
+h2{font-family:'DM Serif Display',serif;font-size:clamp(1.4rem,2.5vw,2rem);margin-bottom:0.75rem;line-height:1.2;}
+.sub{color:var(--muted);font-size:0.9rem;line-height:1.8;max-width:660px;margin-bottom:2.5rem;}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem;}
+.stat-card{background:var(--bg2);padding:1.75rem;text-align:center;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:2.2rem;line-height:1;}
+.stat-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:0.35rem;}
+.section{margin-bottom:3.5rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.6rem;}
+.section-label::before{content:'';display:block;width:1.2rem;height:1px;background:var(--teal);}
+.insight{color:var(--muted);font-size:0.9rem;line-height:1.8;margin-bottom:1.5rem;max-width:700px;}
+.insight strong{color:var(--text);}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);padding:1.75rem;margin-bottom:1.5rem;}
+.chart-title{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.25rem;}
+canvas{max-width:100%;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+.timeline-wrap{background:var(--bg2);border:1px solid var(--border);padding:1.75rem;margin-bottom:1.5rem;}
+.timeline-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px;margin-top:1rem;}
+.tl-cell{height:34px;border-radius:3px;cursor:pointer;transition:transform 0.15s;position:relative;}
+.tl-cell:hover{transform:scale(1.15);z-index:10;}
+.tl-cell.match{background:var(--teal);}
+.tl-cell.miss{background:var(--red);opacity:0.7;}
+.tl-cell.miss:hover{opacity:1;}
+.tl-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border);padding:0.5rem 0.75rem;white-space:nowrap;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text);pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:100;min-width:180px;}
+.tl-cell:hover .tl-tooltip{opacity:1;}
+.tl-tooltip .tt-year{color:var(--teal);margin-bottom:0.2rem;}
+.legend{display:flex;gap:1.5rem;margin-top:0.75rem;}
+.legend-item{display:flex;align-items:center;gap:0.4rem;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);}
+.legend-dot{width:12px;height:12px;border-radius:2px;}
+.verdict-box{border:1px solid var(--border);background:var(--bg2);padding:2rem 2.5rem;margin-bottom:2rem;position:relative;overflow:hidden;}
+.verdict-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.verdict-label{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.4rem;}
+.verdict-title{font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.75rem;}
+.verdict-body{color:var(--muted);font-size:0.9rem;line-height:1.8;}
+.verdict-body strong{color:var(--text);}
+.verdict-note{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--teal);line-height:1.6;}
+.upset-table{width:100%;border-collapse:collapse;}
+.upset-table th{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);}
+.upset-table td{padding:0.65rem 0.75rem;font-size:0.82rem;border-bottom:1px solid rgba(36,41,36,0.5);}
+.upset-table tr:hover td{background:var(--bg3);}
+.upset-table .year-col{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--teal);}
+footer{padding:1.5rem 4rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;margin-top:4rem;}
+footer p{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;}
+footer a{color:var(--teal);text-decoration:none;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--teal-dim);}
+@media(max-width:900px){nav{padding:1rem 1.25rem;}.nav-links{gap:0.75rem;}.page{padding:6rem 1.5rem 3rem;}.stat-row{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}footer{flex-direction:column;gap:0.5rem;padding:1.5rem;}}
+
+.verdict-box::before { background: #e07070; }
+.stat-num { color: #e07070; }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    margin-bottom: 2rem;
+    padding-top: 0.5rem;
+  }
+  .back-link:hover { color: var(--teal); }
+  .back-link::before { content: '←'; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ZR / Data</a>
+  <ul class="nav-links"><li><a href="awards.html">Overview</a></li><li><a href="awards-gg.html">GG Drama</a></li><li><a href="awards-bafta.html">BAFTA</a></li><li><a href="awards-sag.html">SAG Cast</a></li><li><a href="awards-cc.html">Critics Choice</a></li><li><a href="awards-dga.html">DGA</a></li><li><a href="awards-pga.html" class="active">PGA</a></li></ul>
+</nav>
+<div class="page">
+  <a href="index.html" class="back-link">Back to Portfolio</a>
+
+  <!-- HERO -->
+  <div class="eyebrow">Producers Guild</div>
+  <h1>Outstanding Theatrical Motion Picture</h1>
+  <p class="sub">How reliably does the Producers Guild Outstanding Theatrical Motion Picture predict the Academy Award for Best Picture? An analysis of 37 comparable award seasons from the full dataset.</p>
+
+  <!-- STAT ROW -->
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-num">70.3%</div>
+      <div class="stat-label">All-Time Accuracy</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">64%</div>
+      <div class="stat-label">Since 2015</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Peak (1980s)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">26/37</div>
+      <div class="stat-label">Correct Predictions</div>
+    </div>
+  </div>
+
+  <!-- DECADE CHART -->
+  <div class="section">
+    <div class="section-label">Accuracy by Decade</div>
+    <h2>How consistency has changed over time</h2>
+    <div class="chart-wrap">
+      <div class="chart-title">Oscar BP Match Rate by Decade</div>
+      <canvas id="decadeChart" height="260"></canvas>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="section">
+    <div class="section-label">Year by Year</div>
+    <h2>Every season at a glance</h2>
+    <p class="insight">Each cell is one award season. Hover to see details.</p>
+    <div class="timeline-wrap">
+      <div class="chart-title">All Seasons: Did this show predict the Oscar?</div>
+      <div class="timeline-grid" id="timeline"></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#e07070"></div>Correctly predicted Oscar</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red);opacity:0.7"></div>Oscar diverged</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVERGENCES TABLE -->
+  <div class="section">
+    <div class="section-label">Notable Divergences</div>
+    <h2>When the Oscar said no (since 2000)</h2>
+    <p class="insight">These are the seasons where the Producers Guild winner did not go on to win the Oscar for Best Picture.</p>
+    <div class="chart-wrap" style="overflow-x:auto;">
+      <div class="chart-title">Oscar vs PGA Winner: Divergences Since 2000</div>
+      <table class="upset-table">
+        <thead><tr><th>Season</th><th>Oscar Winner</th><th>PGA Winner</th></tr></thead>
+        <tbody><tr><td class="year-col">2019</td><td style="color:var(--text);font-size:0.82rem;">Parasite</td><td style="color:var(--muted);font-size:0.82rem;">1917</td></tr>
+<tr><td class="year-col">2017</td><td style="color:var(--text);font-size:0.82rem;">The Shape of Water</td><td style="color:var(--muted);font-size:0.82rem;">Three Billboards Outside Ebbing, Missouri</td></tr>
+<tr><td class="year-col">2016</td><td style="color:var(--text);font-size:0.82rem;">Moonlight</td><td style="color:var(--muted);font-size:0.82rem;">La La Land</td></tr>
+<tr><td class="year-col">2015</td><td style="color:var(--text);font-size:0.82rem;">Spotlight</td><td style="color:var(--muted);font-size:0.82rem;">The Big Short</td></tr>
+<tr><td class="year-col">2006</td><td style="color:var(--text);font-size:0.82rem;">The Departed</td><td style="color:var(--muted);font-size:0.82rem;">Little Miss Sunshine</td></tr>
+<tr><td class="year-col">2005</td><td style="color:var(--text);font-size:0.82rem;">Crash</td><td style="color:var(--muted);font-size:0.82rem;">Brokeback Mountain</td></tr>
+<tr><td class="year-col">2004</td><td style="color:var(--text);font-size:0.82rem;">Million Dollar Baby</td><td style="color:var(--muted);font-size:0.82rem;">The Aviator</td></tr>
+<tr><td class="year-col">2001</td><td style="color:var(--text);font-size:0.82rem;">A Beautiful Mind</td><td style="color:var(--muted);font-size:0.82rem;">Moulin Rouge!</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="section">
+    <div class="section-label">Verdict</div>
+    <div class="verdict-box">
+      <div class="verdict-label">Assessment</div>
+      <div class="verdict-title">Most reliable predictor</div>
+      <div class="verdict-body">The PGA has the highest Oscar Best Picture accuracy at 70% overall, and a perfect 100% in the 2020s (6 for 6). The Darryl F. Zanuck award uses a preferential ballot system that closely mirrors the Academy's own voting method, and producers make up the largest named branch of the Academy.</div>
+      <div class="verdict-note">If one number to watch, it is the PGA. In the modern era it has been nearly infallible. The only caveat: it does not always overlap with the Oscar director winner.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p><a href="awards.html">Back to Overview</a></p>
+  <p>Zack Russell &copy; 2026 | Awards Predictability Analysis</p>
+</footer>
+
+<script>
+
+const C = {
+  teal: '#e07070', tealDim: '#1f6b5e', accent: '#f0c96e',
+  red: '#e07070', muted: '#7a8c82', border: '#242924',
+  text: '#e8ede9', bg3: '#1a1d1b', bg: '#0d0f0e', bg2: '#131614'
+};
+
+const decadesData = [{"d": "80s", "m": 1, "t": 1, "pct": 100}, {"d": "90s", "m": 7, "t": 10, "pct": 70}, {"d": "00s", "m": 6, "t": 10, "pct": 60}, {"d": "10s", "m": 6, "t": 10, "pct": 60}, {"d": "20s", "m": 6, "t": 6, "pct": 100}];
+const yearlyData = [{"y": 1989, "match": true, "oscar": "Driving Miss Daisy", "winner": "Driving Miss Daisy"}, {"y": 1990, "match": true, "oscar": "Dances with Wolves", "winner": "Dances with Wolves"}, {"y": 1991, "match": true, "oscar": "The Silence of the Lambs", "winner": "The Silence of the Lambs"}, {"y": 1992, "match": false, "oscar": "Unforgiven", "winner": "The Crying Game"}, {"y": 1993, "match": true, "oscar": "Schindler's List", "winner": "Schindler's List"}, {"y": 1994, "match": true, "oscar": "Forrest Gump", "winner": "Forrest Gump"}, {"y": 1995, "match": false, "oscar": "Braveheart", "winner": "Apollo 13"}, {"y": 1996, "match": true, "oscar": "The English Patient", "winner": "The English Patient"}, {"y": 1997, "match": true, "oscar": "Titanic", "winner": "Titanic"}, {"y": 1998, "match": false, "oscar": "Shakespeare in Love", "winner": "Saving Private Ryan"}, {"y": 1999, "match": true, "oscar": "American Beauty", "winner": "American Beauty"}, {"y": 2000, "match": true, "oscar": "Gladiator", "winner": "Gladiator"}, {"y": 2001, "match": false, "oscar": "A Beautiful Mind", "winner": "Moulin Rouge!"}, {"y": 2002, "match": true, "oscar": "Chicago", "winner": "Chicago"}, {"y": 2003, "match": true, "oscar": "The Lord of the Rings: The Return of the King", "winner": "The Lord of the Rings: The Return of the King"}, {"y": 2004, "match": false, "oscar": "Million Dollar Baby", "winner": "The Aviator"}, {"y": 2005, "match": false, "oscar": "Crash", "winner": "Brokeback Mountain"}, {"y": 2006, "match": false, "oscar": "The Departed", "winner": "Little Miss Sunshine"}, {"y": 2007, "match": true, "oscar": "No Country for Old Men", "winner": "No Country for Old Men"}, {"y": 2008, "match": true, "oscar": "Slumdog Millionaire", "winner": "Slumdog Millionaire"}, {"y": 2009, "match": true, "oscar": "The Hurt Locker", "winner": "The Hurt Locker"}, {"y": 2010, "match": true, "oscar": "The King's Speech", "winner": "The King's Speech"}, {"y": 2011, "match": true, "oscar": "The Artist", "winner": "The Artist"}, {"y": 2012, "match": true, "oscar": "Argo", "winner": "Argo"}, {"y": 2013, "match": true, "oscar": "12 Years a Slave", "winner": "12 Years a Slave"}, {"y": 2014, "match": true, "oscar": "Birdman", "winner": "Birdman"}, {"y": 2015, "match": false, "oscar": "Spotlight", "winner": "The Big Short"}, {"y": 2016, "match": false, "oscar": "Moonlight", "winner": "La La Land"}, {"y": 2017, "match": false, "oscar": "The Shape of Water", "winner": "Three Billboards Outside Ebbing, Missouri"}, {"y": 2018, "match": true, "oscar": "Green Book", "winner": "Green Book"}, {"y": 2019, "match": false, "oscar": "Parasite", "winner": "1917"}, {"y": 2020, "match": true, "oscar": "Nomadland", "winner": "Nomadland"}, {"y": 2021, "match": true, "oscar": "CODA", "winner": "CODA"}, {"y": 2022, "match": true, "oscar": "Everything Everywhere All at Once", "winner": "Everything Everywhere All at Once"}, {"y": 2023, "match": true, "oscar": "Oppenheimer", "winner": "Oppenheimer"}, {"y": 2024, "match": true, "oscar": "Anora", "winner": "Anora"}, {"y": 2025, "match": true, "oscar": "One Battle After Another", "winner": "One Battle After Another"}];
+
+// DECADE BAR CHART
+function drawDecadeChart() {
+  const canvas = document.getElementById('decadeChart');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.getBoundingClientRect().width || 600;
+  const H = 260;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const pad = {l:46, r:20, t:24, b:36};
+  const chartW = W - pad.l - pad.r;
+  const chartH = H - pad.t - pad.b;
+  const n = decadesData.length;
+  const barW = chartW / n * 0.62;
+  const gap = chartW / n;
+  const avg = 70.3;
+
+  [0,25,50,75,100].forEach(v => {
+    const y = pad.t + chartH * (1 - v/100);
+    ctx.beginPath();
+    ctx.strokeStyle = v === 0 ? C.muted : C.border;
+    ctx.lineWidth = v === 0 ? 1 : 0.5;
+    ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y);
+    ctx.stroke();
+    ctx.fillStyle = C.muted;
+    ctx.font = '9px DM Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(v + '%', pad.l - 5, y + 3);
+  });
+
+  const avgY = pad.t + chartH * (1 - avg/100);
+  ctx.setLineDash([5,3]);
+  ctx.beginPath(); ctx.strokeStyle = C.accent; ctx.lineWidth = 1;
+  ctx.moveTo(pad.l, avgY); ctx.lineTo(W - pad.r, avgY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = C.accent;
+  ctx.font = '8px DM Mono, monospace';
+  ctx.textAlign = 'left';
+  ctx.fillText(avg + '% avg', pad.l + 4, avgY - 3);
+
+  decadesData.forEach((d, i) => {
+    const x = pad.l + i * gap + (gap - barW) / 2;
+    const bh = chartH * d.pct / 100;
+    const y = pad.t + chartH - bh;
+    const col = d.pct >= avg + 10 ? C.teal : d.pct >= avg - 15 ? 'rgba(62,207,178,0.45)' : 'rgba(224,112,112,0.55)';
+    ctx.fillStyle = col;
+    ctx.fillRect(x, y, barW, bh);
+    ctx.fillStyle = C.text;
+    ctx.font = 'bold 10px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(d.pct + '%', x + barW/2, y - 5);
+    ctx.fillStyle = C.muted;
+    ctx.font = '9px DM Mono, monospace';
+    ctx.fillText(d.d, x + barW/2, H - 8);
+  });
+}
+
+// TIMELINE
+(function() {
+  const container = document.getElementById('timeline');
+  yearlyData.forEach(d => {
+    const cell = document.createElement('div');
+    cell.className = 'tl-cell ' + (d.match ? 'match' : 'miss');
+    if (d.match) cell.style.background = C.teal;
+    const tip = document.createElement('div');
+    tip.className = 'tl-tooltip';
+    tip.innerHTML = `<div class="tt-year">${d.y}</div>
+      <div>Oscar: ${d.oscar}</div>
+      <div style="color:${d.match ? C.teal : C.red}">${d.match ? 'Correctly predicted' : 'Picked: ' + d.winner}</div>`;
+    cell.appendChild(tip);
+    container.appendChild(cell);
+  });
+})();
+
+requestAnimationFrame(drawDecadeChart);
+</script>
+</body>
+</html>

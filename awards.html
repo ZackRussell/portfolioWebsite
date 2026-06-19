@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Awards Predictability | Zack Russell</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f0e; --bg2: #131614; --bg3: #1a1d1b;
+  --teal: #3ecfb2; --teal-dim: #1f6b5e; --teal-glow: rgba(62,207,178,0.12);
+  --text: #e8ede9; --muted: #7a8c82; --border: #242924; --accent: #f0c96e;
+  --red: #e07070;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 3rem;display:flex;justify-content:space-between;align-items:center;background:rgba(13,15,14,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--teal);letter-spacing:0.1em;text-decoration:none;}
+.nav-links{display:flex;gap:1.5rem;list-style:none;flex-wrap:wrap;}
+.nav-links a{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;transition:color 0.2s;padding:0.25rem 0.5rem;border:1px solid transparent;}
+.nav-links a:hover{color:var(--teal);}
+.nav-links a.active{color:var(--teal);border-color:var(--teal-dim);}
+.page{padding:7rem 4rem 4rem;max-width:1200px;margin:0 auto;}
+.eyebrow{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.6rem;}
+.eyebrow::before{content:'';display:block;width:1.5rem;height:1px;background:var(--teal);}
+h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4.5vw,3.5rem);line-height:1.1;margin-bottom:1.25rem;}
+h1 em{font-style:italic;}
+h2{font-family:'DM Serif Display',serif;font-size:clamp(1.4rem,2.5vw,2rem);margin-bottom:0.75rem;line-height:1.2;}
+.sub{color:var(--muted);font-size:0.9rem;line-height:1.8;max-width:660px;margin-bottom:2.5rem;}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3rem;}
+.stat-card{background:var(--bg2);padding:1.75rem;text-align:center;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:2.2rem;line-height:1;}
+.stat-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:0.35rem;}
+.section{margin-bottom:3.5rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.6rem;}
+.section-label::before{content:'';display:block;width:1.2rem;height:1px;background:var(--teal);}
+.insight{color:var(--muted);font-size:0.9rem;line-height:1.8;margin-bottom:1.5rem;max-width:700px;}
+.insight strong{color:var(--text);}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);padding:1.75rem;margin-bottom:1.5rem;}
+.chart-title{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.25rem;}
+canvas{max-width:100%;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+.timeline-wrap{background:var(--bg2);border:1px solid var(--border);padding:1.75rem;margin-bottom:1.5rem;}
+.timeline-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px;margin-top:1rem;}
+.tl-cell{height:34px;border-radius:3px;cursor:pointer;transition:transform 0.15s;position:relative;}
+.tl-cell:hover{transform:scale(1.15);z-index:10;}
+.tl-cell.match{background:var(--teal);}
+.tl-cell.miss{background:var(--red);opacity:0.7;}
+.tl-cell.miss:hover{opacity:1;}
+.tl-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border);padding:0.5rem 0.75rem;white-space:nowrap;font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text);pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:100;min-width:180px;}
+.tl-cell:hover .tl-tooltip{opacity:1;}
+.tl-tooltip .tt-year{color:var(--teal);margin-bottom:0.2rem;}
+.legend{display:flex;gap:1.5rem;margin-top:0.75rem;}
+.legend-item{display:flex;align-items:center;gap:0.4rem;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);}
+.legend-dot{width:12px;height:12px;border-radius:2px;}
+.verdict-box{border:1px solid var(--border);background:var(--bg2);padding:2rem 2.5rem;margin-bottom:2rem;position:relative;overflow:hidden;}
+.verdict-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.verdict-label{font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:0.4rem;}
+.verdict-title{font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.75rem;}
+.verdict-body{color:var(--muted);font-size:0.9rem;line-height:1.8;}
+.verdict-body strong{color:var(--text);}
+.verdict-note{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--teal);line-height:1.6;}
+.upset-table{width:100%;border-collapse:collapse;}
+.upset-table th{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);}
+.upset-table td{padding:0.65rem 0.75rem;font-size:0.82rem;border-bottom:1px solid rgba(36,41,36,0.5);}
+.upset-table tr:hover td{background:var(--bg3);}
+.upset-table .year-col{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--teal);}
+footer{padding:1.5rem 4rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;margin-top:4rem;}
+footer p{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);letter-spacing:0.06em;}
+footer a{color:var(--teal);text-decoration:none;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--teal-dim);}
+@media(max-width:900px){nav{padding:1rem 1.25rem;}.nav-links{gap:0.75rem;}.page{padding:6rem 1.5rem 3rem;}.stat-row{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}footer{flex-direction:column;gap:0.5rem;padding:1.5rem;}}
+
+.show-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3.5rem;}
+.show-card{background:var(--bg2);padding:1.75rem;text-decoration:none;display:block;transition:background 0.2s;position:relative;overflow:hidden;border-top:3px solid var(--card-color,var(--teal));}
+.show-card:hover{background:var(--bg3);}
+.show-card-label{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.25rem;}
+.show-card-sub{font-size:0.82rem;color:var(--text);margin-bottom:1rem;line-height:1.4;}
+.show-card-pct{font-family:'DM Serif Display',serif;font-size:2.5rem;line-height:1;margin-bottom:0.25rem;}
+.show-card-meta{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem;}
+.show-card-recent{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);}
+.finding{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--teal);padding:1.25rem 1.5rem;margin-bottom:1rem;}
+.finding-num{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--teal);display:block;margin-bottom:0.3rem;letter-spacing:0.1em;}
+.finding-text{font-size:0.9rem;color:var(--muted);line-height:1.75;}
+.finding-text strong{color:var(--text);}
+.answer-box{background:var(--bg2);border:1px solid var(--teal-dim);padding:2.5rem;margin-bottom:2rem;}
+.answer-box h2{margin-bottom:1rem;}
+@media(max-width:900px){.show-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.show-grid{grid-template-columns:1fr;}}
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    margin-bottom: 2rem;
+    padding-top: 0.5rem;
+  }
+  .back-link:hover { color: var(--teal); }
+  .back-link::before { content: '←'; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ZR / Data</a>
+  <ul class="nav-links">
+    <li><a href="awards.html" class="active">Overview</a></li>
+    <li><a href="awards-gg.html">GG Drama</a></li><li><a href="awards-bafta.html">BAFTA</a></li><li><a href="awards-sag.html">SAG Cast</a></li><li><a href="awards-cc.html">Critics Choice</a></li><li><a href="awards-dga.html">DGA</a></li><li><a href="awards-pga.html">PGA</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <a href="index.html" class="back-link">Back to Portfolio</a>
+
+  <!-- HERO -->
+  <div class="eyebrow">Case Study</div>
+  <h1>Which awards show best<br>predicts the <em>Oscar</em>?</h1>
+  <p class="sub">An analysis of 7 major awards shows spanning up to 83 years of data, measuring how reliably each predicts the Academy Award for Best Picture. Built from a custom relational database of 1,691+ nominations across the Oscars, Golden Globes, BAFTA, SAG, Critics Choice, DGA, and PGA.</p>
+  <div style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);">
+    <span>Dataset: <strong style="color:var(--text);">1928-2026</strong></span>
+    <span>Shows: <strong style="color:var(--text);">7 ceremonies</strong></span>
+    <span>Records: <strong style="color:var(--text);">1,691+ nominations</strong></span>
+    <span>Tools: <strong style="color:var(--text);">Python · openpyxl · Canvas</strong></span>
+  </div>
+
+  <!-- SHOW CARDS -->
+  <div class="section">
+    <div class="section-label">Explore by Show</div>
+    <h2>Select an awards show for the full analysis</h2>
+    <div class="show-grid">
+    <a href="awards-gg.html" class="show-card" style="--card-color:#3ecfb2;">
+      <div class="show-card-label">Golden Globes</div>
+      <div class="show-card-sub">Best Picture - Drama</div>
+      <div class="show-card-pct" style="color:#3ecfb2;">48.2%</div>
+      <div class="show-card-meta">all-time accuracy</div>
+      <div class="show-card-recent">27% since 2015 &rarr;</div>
+    </a>
+    <a href="awards-bafta.html" class="show-card" style="--card-color:#6eb4f0;">
+      <div class="show-card-label">BAFTA</div>
+      <div class="show-card-sub">Best Film</div>
+      <div class="show-card-pct" style="color:#6eb4f0;">35.4%</div>
+      <div class="show-card-meta">all-time accuracy</div>
+      <div class="show-card-recent">27% since 2015 &rarr;</div>
+    </a>
+    <a href="awards-sag.html" class="show-card" style="--card-color:#c47af0;">
+      <div class="show-card-label">SAG Awards</div>
+      <div class="show-card-sub">Outstanding Cast in a Motion Picture</div>
+      <div class="show-card-pct" style="color:#c47af0;">46.9%</div>
+      <div class="show-card-meta">all-time accuracy</div>
+      <div class="show-card-recent">36% since 2015 &rarr;</div>
+    </a>
+    <a href="awards-cc.html" class="show-card" style="--card-color:#f0c96e;">
+      <div class="show-card-label">Critics Choice</div>
+      <div class="show-card-sub">Best Picture</div>
+      <div class="show-card-pct" style="color:#f0c96e;">41.9%</div>
+      <div class="show-card-meta">all-time accuracy</div>
+      <div class="show-card-recent">45% since 2015 &rarr;</div>
+    </a>
+    <a href="awards-dga.html" class="show-card" style="--card-color:#f09e6e;">
+      <div class="show-card-label">Directors Guild</div>
+      <div class="show-card-sub">Outstanding Feature Film</div>
+      <div class="show-card-pct" style="color:#f09e6e;">64.1%</div>
+      <div class="show-card-meta">all-time accuracy</div>
+      <div class="show-card-recent">45% since 2015 &rarr;</div>
+    </a>
+    <a href="awards-pga.html" class="show-card" style="--card-color:#e07070;">
+      <div class="show-card-label">Producers Guild</div>
+      <div class="show-card-sub">Outstanding Theatrical Motion Picture</div>
+      <div class="show-card-pct" style="color:#e07070;">70.3%</div>
+      <div class="show-card-meta">all-time accuracy</div>
+      <div class="show-card-recent">64% since 2015 &rarr;</div>
+    </a></div>
+  </div>
+
+  <!-- OVERALL COMPARISON CHART -->
+  <div class="section">
+    <div class="section-label">Cross-Show Comparison</div>
+    <h2>All-time vs. recent accuracy</h2>
+    <p class="insight">The guild awards (PGA, DGA) consistently outperform the press and industry awards in predicting Oscar Best Picture. The gap has widened since 2015 as Academy tastes have diversified.</p>
+    <div class="chart-wrap">
+      <div class="chart-title">Oscar BP Prediction Accuracy: All Shows (faded = all-time, solid = since 2015)</div>
+      <canvas id="compChart" height="300"></canvas>
+    </div>
+  </div>
+
+  <!-- SWEEP TABLE -->
+  <div class="section">
+    <div class="section-label">Consensus Seasons</div>
+    <h2>When multiple shows agreed</h2>
+    <p class="insight">Films winning 3+ major precursors before Oscar night have a strong track record. The more shows that align, the more reliable the forecast, especially when PGA and DGA are among them.</p>
+    <div class="chart-wrap" style="overflow-x:auto;">
+      <div class="chart-title">Multi-Show Sweeps and Oscar Outcome</div>
+      <table class="upset-table">
+        <thead><tr><th>Season</th><th>Film</th><th>Shows Won</th><th>Won Oscar?</th></tr></thead>
+        <tbody><tr><td class="year-col">2025</td><td style="color:var(--text);font-size:0.82rem;">One Battle After Another</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+<tr><td class="year-col">2023</td><td style="color:var(--text);font-size:0.82rem;">Oppenheimer</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">SAG Cast</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+<tr><td class="year-col">2022</td><td style="color:var(--text);font-size:0.82rem;">Everything Everywhere All at Once</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">SAG Cast</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+<tr><td class="year-col">2020</td><td style="color:var(--text);font-size:0.82rem;">Nomadland</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+<tr><td class="year-col">2019</td><td style="color:var(--text);font-size:0.82rem;">1917</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--red);font-family:'DM Mono',monospace;font-size:0.72rem;">NO</td></tr>
+<tr><td class="year-col">2017</td><td style="color:var(--text);font-size:0.82rem;">Three Billboards Outside Ebbing, Missouri</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">SAG Cast</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--red);font-family:'DM Mono',monospace;font-size:0.72rem;">NO</td></tr>
+<tr><td class="year-col">2013</td><td style="color:var(--text);font-size:0.82rem;">12 Years a Slave</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">SAG Cast</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+<tr><td class="year-col">2012</td><td style="color:var(--text);font-size:0.82rem;">Argo</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">SAG Cast</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+<tr><td class="year-col">2010</td><td style="color:var(--text);font-size:0.82rem;">The King's Speech</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--red);font-family:'DM Mono',monospace;font-size:0.72rem;">NO</td></tr>
+<tr><td class="year-col">2009</td><td style="color:var(--text);font-size:0.82rem;">The Hurt Locker</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">Critics Choice</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+<tr><td class="year-col">2008</td><td style="color:var(--text);font-size:0.82rem;">Slumdog Millionaire</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">SAG Cast</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+<tr><td class="year-col">2003</td><td style="color:var(--text);font-size:0.82rem;">The Lord of the Rings: The Return of the King</td><td><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">GG Drama</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">BAFTA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">SAG Cast</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">DGA</span><span style="font-family:DM Mono,monospace;font-size:0.62rem;padding:0.15rem 0.4rem;border:1px solid var(--border);color:var(--muted);margin-right:3px;">PGA</span></td><td style="color:var(--teal);font-family:'DM Mono',monospace;font-size:0.72rem;">YES</td></tr>
+</tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- KEY FINDINGS -->
+  <div class="section">
+    <div class="section-label">Key Findings</div>
+    <h2>What the data shows</h2>
+    <div class="finding">
+      <span class="finding-num">Finding 01</span>
+      <div class="finding-text">The <strong>PGA is the single best predictor</strong> at 70% all-time and a perfect 100% since 2020 (6 for 6). Its preferential ballot format mirrors the Academy's own Best Picture voting method, making it structurally the most reliable signal.</div>
+    </div>
+    <div class="finding">
+      <span class="finding-num">Finding 02</span>
+      <div class="finding-text">The <strong>DGA is the most consistent long-term predictor</strong> at 64% overall with 83% accuracy since 2020. Unlike the PGA, it awards directors rather than producers, but directors constitute a large Academy bloc whose tastes closely track the full membership.</div>
+    </div>
+    <div class="finding">
+      <span class="finding-num">Finding 03</span>
+      <div class="finding-text">The <strong>Golden Globes Drama category has declined sharply</strong>, from 71% in the 1940s to just 27% since 2015. As the Academy expanded and diversified post-2016, GG Drama became a reliable signal of the critical frontrunner, not the eventual Oscar winner.</div>
+    </div>
+    <div class="finding">
+      <span class="finding-num">Finding 04</span>
+      <div class="finding-text">The <strong>Critics Choice has surged in recent years</strong> to 83% since 2020, tied with the DGA for the highest recent accuracy. This likely reflects the CCA's expanded voting body converging with modern Academy preferences. Its historical average of 42% understates its current relevance.</div>
+    </div>
+    <div class="finding">
+      <span class="finding-num">Finding 05</span>
+      <div class="finding-text"><strong>Consensus matters most</strong>. When PGA, DGA, and SAG all agree on the same film, it has won the Oscar at a very high rate. Single-show winners with no guild support are frequently upset. The most reliable signal is convergence across multiple voting bodies.</div>
+    </div>
+  </div>
+
+  <!-- FINAL ANSWER -->
+  <div class="section">
+    <div class="section-label">The Answer</div>
+    <div class="answer-box">
+      <h2>So which show should you watch?</h2>
+      <p class="insight" style="margin-bottom:1.25rem;">If you can only track one awards show before the Oscars, <strong>watch the PGA</strong>. Its voting format mirrors the Academy's Best Picture ballot most closely, and it has called the winner correctly 70% of the time overall. In the last six years it has been perfect.</p>
+      <p class="insight" style="margin-bottom:1.25rem;">If you want a two-show system: <strong>PGA plus DGA</strong>. When both agree, the Oscar outcome is highly predictable. When they split, look to SAG as a tiebreaker, actors are the Academy's largest branch.</p>
+      <p class="insight" style="margin-bottom:0;">The Golden Globes make great television and generate real momentum. But in the modern era, they predict the Oscar winner less reliably than a coin flip in some years. Use them to understand the narrative of the season, not to forecast the winner.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p><a href="index.html">Back to Portfolio</a></p>
+  <p>Zack Russell &copy; 2026 | Awards Predictability Analysis</p>
+</footer>
+
+<script>
+const C = {
+  teal: '#3ecfb2', tealDim: '#1f6b5e', accent: '#f0c96e',
+  red: '#e07070', muted: '#7a8c82', border: '#242924',
+  text: '#e8ede9', bg3: '#1a1d1b', bg: '#0d0f0e', bg2: '#131614'
+};
+
+const compData = [
+  {label:'PGA',      overall:70.3, recent:64, color:'#e07070'},
+  {label:'DGA',      overall:64.1, recent:45, color:'#f09e6e'},
+  {label:'GG Drama', overall:48.2, recent:27, color:'#3ecfb2'},
+  {label:'SAG Cast', overall:46.9, recent:36, color:'#c47af0'},
+  {label:'Critics',  overall:41.9, recent:45, color:'#f0c96e'},
+  {label:'BAFTA',    overall:35.4, recent:27, color:'#6eb4f0'},
+  {label:'GG Comedy',overall:18.9, recent:18, color:'#1f6b5e'},
+];
+
+function drawCompChart() {
+  const canvas = document.getElementById('compChart');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.getBoundingClientRect().width || 700;
+  const H = 300;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const n = compData.length;
+  const pad = {l:20, r:20, t:24, b:60};
+  const chartW = W - pad.l - pad.r;
+  const chartH = H - pad.t - pad.b;
+  const groupW = chartW / n;
+  const barW = groupW * 0.32;
+
+  [0,25,50,75,100].forEach(v => {
+    const y = pad.t + chartH*(1-v/100);
+    ctx.beginPath(); ctx.strokeStyle = v===0?C.muted:C.border; ctx.lineWidth=0.5;
+    ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.fillStyle=C.muted; ctx.font='8px DM Mono,monospace'; ctx.textAlign='left';
+    ctx.fillText(v+'%', 2, y+3);
+  });
+
+  compData.forEach((d,i) => {
+    const cx = pad.l + i*groupW + groupW/2;
+    const h1 = chartH*d.overall/100;
+    const h2 = chartH*d.recent/100;
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = d.color;
+    ctx.fillRect(cx-barW-2, pad.t+chartH-h1, barW, h1);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = d.color;
+    ctx.fillRect(cx+2, pad.t+chartH-h2, barW, h2);
+    // Overall pct label
+    ctx.fillStyle = C.muted; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(d.overall+'%', cx-barW/2-2, pad.t+chartH-h1-4);
+    // Recent pct label
+    ctx.fillStyle = d.color;
+    ctx.fillText(d.recent+'%', cx+barW/2+2, pad.t+chartH-h2-4);
+    // X label
+    ctx.fillStyle=C.muted; ctx.font='9px DM Mono,monospace';
+    ctx.fillText(d.label, cx, H-pad.b+14);
+  });
+
+  // Legend
+  ctx.globalAlpha=0.35; ctx.fillStyle=C.muted; ctx.fillRect(pad.l, H-12, 14, 8); ctx.globalAlpha=1;
+  ctx.fillStyle=C.teal; ctx.fillRect(pad.l+80, H-12, 14, 8);
+  ctx.fillStyle=C.muted; ctx.font='9px DM Mono,monospace'; ctx.textAlign='left';
+  ctx.fillText('All-time', pad.l+18, H-5);
+  ctx.fillText('Since 2015', pad.l+98, H-5);
+}
+
+requestAnimationFrame(drawCompChart);
+</script>
+</body>
+</html>

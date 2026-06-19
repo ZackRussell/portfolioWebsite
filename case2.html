@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Study 2: Product Adoption | Zack Russell</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d0f0e;--bg2:#131614;--bg3:#1a1d1b;
+  --teal:#3ecfb2;--teal-dim:#1f6b5e;--teal-glow:rgba(62,207,178,0.12);
+  --text:#e8ede9;--muted:#7a8c82;--border:#242924;--accent:#f0c96e;--red:#e07070;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7;overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 3rem;display:flex;justify-content:space-between;align-items:center;background:rgba(13,15,14,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'DM Mono',monospace;font-size:0.8rem;color:var(--teal);letter-spacing:0.1em;text-decoration:none;}
+.nav-links{display:flex;gap:1.5rem;list-style:none;}
+.nav-links a{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--teal);}
+.back-link{display:inline-flex;align-items:center;gap:0.5rem;font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s;margin-bottom:2rem;padding-top:0.5rem;}
+.back-link:hover{color:var(--teal);}
+.back-link::before{content:'←';font-size:0.9rem;}
+.page{padding:7rem 4rem 4rem;max-width:1100px;margin:0 auto;}
+.eyebrow{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.6rem;}
+.eyebrow::before{content:'';display:block;width:1.5rem;height:1px;background:var(--teal);}
+h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4.5vw,3.5rem);line-height:1.1;margin-bottom:1.25rem;}
+h1 em{font-style:italic;color:var(--teal);}
+h2{font-family:'DM Serif Display',serif;font-size:clamp(1.4rem,2.5vw,2rem);margin-bottom:0.75rem;line-height:1.2;}
+h3{font-family:'DM Serif Display',serif;font-size:1.2rem;margin-bottom:0.5rem;}
+.sub{color:var(--muted);font-size:0.9rem;line-height:1.8;max-width:700px;margin-bottom:2.5rem;}
+.meta{display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border);}
+.meta span{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.08em;}
+.meta strong{color:var(--text);}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:3.5rem;}
+.stat-card{background:var(--bg2);padding:1.75rem;text-align:center;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--teal);line-height:1;}
+.stat-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:0.35rem;}
+.section{margin-bottom:4rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--teal);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.6rem;display:flex;align-items:center;gap:0.6rem;}
+.section-label::before{content:'';display:block;width:1.2rem;height:1px;background:var(--teal);}
+.prose{color:var(--muted);font-size:0.95rem;line-height:1.85;margin-bottom:1.25rem;}
+.prose strong{color:var(--text);}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border);padding:1.75rem;margin-bottom:1.5rem;}
+.chart-title{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.25rem;}
+canvas{max-width:100%;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+.code-block{background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--teal);padding:1.25rem 1.5rem;font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--text);line-height:1.7;overflow-x:auto;margin-bottom:1.5rem;white-space:pre;}
+.code-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;}
+.finding{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--teal);padding:1.25rem 1.5rem;margin-bottom:1rem;}
+.finding-num{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--teal);display:block;margin-bottom:0.3rem;letter-spacing:0.1em;}
+.finding-text{font-size:0.9rem;color:var(--muted);line-height:1.75;}
+.finding-text strong{color:var(--text);}
+.legend{display:flex;gap:1.5rem;margin-top:0.75rem;flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:0.4rem;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--muted);}
+.legend-dot{width:12px;height:12px;border-radius:2px;}
+.outcome-box{background:var(--bg2);border:1px solid var(--teal-dim);padding:2.5rem;margin-bottom:2rem;}
+.outcome-box h2{margin-bottom:1rem;}
+footer{padding:1.5rem 4rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;margin-top:4rem;}
+footer p{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);}
+footer a{color:var(--teal);text-decoration:none;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--teal-dim);}
+@media(max-width:900px){nav{padding:1rem 1.25rem;}.page{padding:6rem 1.5rem 3rem;}.stat-row{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}footer{flex-direction:column;gap:0.5rem;padding:1.5rem;}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">ZR / Data</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Portfolio</a></li>
+    <li><a href="awards.html">Case Study 1</a></li>
+    <li><a href="case2.html" class="active">Case Study 2</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+  <a href="index.html" class="back-link">Back to Portfolio</a>
+
+  <div class="eyebrow">Case Study 2</div>
+  <h1>The data story that drove<br><em>5x product adoption</em></h1>
+  <p class="sub">A walkthrough of the product analytics work that transformed how a veterinary SaaS company understood its users — from fragmented guesswork to a unified metrics framework that directly influenced roadmap decisions and drove measurable growth across three products.</p>
+
+  <div class="meta">
+    <span>Context: <strong>Veterinary SaaS (anonymized)</strong></span>
+    <span>Products: <strong>3 (mobile + desktop)</strong></span>
+    <span>Users analyzed: <strong>1,200+</strong></span>
+    <span>Tools: <strong>SQL · Python · Mixpanel · Klipfolio · Power BI</strong></span>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="stat-num">5x</div><div class="stat-label">Adoption Increase</div></div>
+    <div class="stat-card"><div class="stat-num">14.5%</div><div class="stat-label">Pre-Framework Activation</div></div>
+    <div class="stat-card"><div class="stat-num">44.6%</div><div class="stat-label">Post-Framework Activation</div></div>
+    <div class="stat-card"><div class="stat-num">1,000+</div><div class="stat-label">Dashboards Built</div></div>
+  </div>
+
+  <!-- SECTION 1: THE PROBLEM -->
+  <div class="section">
+    <div class="section-label">01 / The Problem</div>
+    <h2>Nobody agreed on what "active user" meant</h2>
+    <p class="prose">When I joined the analytics function, three separate products — each with mobile app and desktop versions — were being measured in three separate ways. Product used session counts. Marketing used login events. Finance used billing records. None of them matched, and leadership meetings frequently stalled on which number to trust.</p>
+    <p class="prose">There was no unified activation definition, no funnel visibility, and no way to identify where users were dropping off before they experienced the core value of any product. The team knew adoption was low but had no structured way to diagnose why or measure whether interventions were working.</p>
+    <p class="prose">The question I set out to answer: <strong>where exactly are users falling out of the product experience, and what does a fully activated user look like?</strong></p>
+  </div>
+
+  <!-- SECTION 2: THE APPROACH -->
+  <div class="section">
+    <div class="section-label">02 / The Approach</div>
+    <h2>Defining activation before measuring it</h2>
+    <p class="prose">The first step was not writing a query. It was getting alignment on definitions. I ran working sessions with Product, Marketing, and Customer Success to agree on a single activation framework — a sequence of behaviors that a user had to complete to be considered genuinely activated rather than simply registered.</p>
+
+    <div class="code-label">Activation framework — agreed definition</div>
+    <div class="code-block">-- Seven-step activation sequence
+-- A user is "fully activated" when they complete all steps
+-- within 30 days of account creation
+
+SELECT
+  u.user_id,
+  u.product,
+  u.platform,
+  u.segment,
+  u.signup_date,
+  MAX(CASE WHEN e.event = 'first_login'          THEN 1 ELSE 0 END) AS step_1,
+  MAX(CASE WHEN e.event = 'profile_completed'    THEN 1 ELSE 0 END) AS step_2,
+  MAX(CASE WHEN e.event = 'first_search'         THEN 1 ELSE 0 END) AS step_3,
+  MAX(CASE WHEN e.event = 'first_content_viewed' THEN 1 ELSE 0 END) AS step_4,
+  MAX(CASE WHEN e.event = 'bookmark_created'     THEN 1 ELSE 0 END) AS step_5,
+  MAX(CASE WHEN e.event = 'return_visit_7d'      THEN 1 ELSE 0 END) AS step_6,
+  -- Fully activated = completed all six post-signup steps
+  CASE WHEN
+    MAX(CASE WHEN e.event = 'return_visit_7d' THEN 1 ELSE 0 END) = 1
+  THEN 1 ELSE 0 END AS fully_activated
+FROM users u
+LEFT JOIN events e
+  ON u.user_id = e.user_id
+  AND e.timestamp <= DATEADD(day, 30, u.signup_date)
+GROUP BY 1,2,3,4,5</div>
+
+    <p class="prose">With the definition in place I instrumented the full event taxonomy in Mixpanel across all three products — mobile and desktop — and built the ETL pipeline that pulled those events into our data warehouse on a nightly schedule. For the first time, all three products were measured against the same standard.</p>
+  </div>
+
+  <!-- SECTION 3: THE FUNNEL -->
+  <div class="section">
+    <div class="section-label">03 / The Finding</div>
+    <h2>The drop-off was earlier than anyone expected</h2>
+    <p class="prose">Once the pipeline was running I ran the funnel analysis across the full user base. The results were stark. Only <strong>14.5% of users were reaching full activation</strong>. The biggest single drop-off was not at a late step — it was at profile completion, where more than a third of users who had already logged in were stopping.</p>
+    <p class="prose">On mobile the profile completion rate was measurably worse than desktop, which the team had not previously known. The mobile onboarding flow had several more required fields than desktop, a decision made years earlier that nobody had revisited.</p>
+  </div>
+
+  <!-- FUNNEL CHART -->
+  <div class="section">
+    <div class="chart-wrap">
+      <div class="chart-title">Activation Funnel: Before vs After Metrics Framework</div>
+      <canvas id="funnelChart" height="320"></canvas>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(224,112,112,0.7)"></div>Pre-framework (14.5% activation)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Post-framework (44.6% activation)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: PLATFORM + SEGMENT -->
+  <div class="section">
+    <div class="section-label">04 / Going Deeper</div>
+    <h2>Segment and platform breakdowns surfaced the real story</h2>
+    <p class="prose">Aggregate funnel numbers tell you there is a problem. Segmented analysis tells you where to act. I broke the funnel down by practice size and platform to find the highest-leverage intervention points.</p>
+    <div class="two-col">
+      <div class="chart-wrap">
+        <div class="chart-title">Activation Rate by Practice Segment (Pre-Framework)</div>
+        <canvas id="segmentChart" height="240"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Profile Completion by Platform (Pre-Framework)</div>
+        <canvas id="platformChart" height="240"></canvas>
+      </div>
+    </div>
+    <p class="prose">Small practices — which made up 50% of the user base — had the lowest activation rate at 13.6%. Large practices, with dedicated staff and more onboarding support, activated at 19.3%. The platform gap was equally telling: mobile users completed profile setup at a rate 2 points lower than desktop, and the gap compounded through every downstream step.</p>
+  </div>
+
+  <!-- SECTION 5: SQL DEEP DIVE -->
+  <div class="section">
+    <div class="section-label">05 / The Analysis</div>
+    <h2>Finding the exact drop-off point</h2>
+    <p class="prose">The funnel showed where users stopped. The next query answered why — by looking at time-to-complete for each step and identifying which steps had the longest median lag, signaling friction rather than disinterest.</p>
+    <div class="code-label">Time-to-completion analysis by step and platform</div>
+    <div class="code-block">-- Median hours between each activation step, by platform
+-- High median = friction point worth investigating
+
+WITH step_times AS (
+  SELECT
+    e1.user_id,
+    e1.platform,
+    e1.event AS current_step,
+    e2.event AS next_step,
+    DATEDIFF(hour, e1.timestamp, e2.timestamp) AS hours_to_next
+  FROM events e1
+  JOIN events e2
+    ON e1.user_id = e2.user_id
+    AND e2.step_order = e1.step_order + 1
+)
+SELECT
+  current_step,
+  next_step,
+  platform,
+  PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY hours_to_next) AS median_hours,
+  COUNT(*) AS user_count
+FROM step_times
+GROUP BY 1, 2, 3
+ORDER BY current_step, platform</div>
+
+    <p class="prose">The results confirmed what the funnel suggested: the median time from first login to profile completion was <strong>6.2 hours on mobile vs 2.1 hours on desktop</strong>. Users were starting the flow, hitting the required fields, and abandoning. Many never came back.</p>
+  </div>
+
+  <!-- SECTION 6: RETENTION -->
+  <div class="section">
+    <div class="section-label">06 / The Outcome</div>
+    <h2>What changed after the framework launched</h2>
+    <p class="prose">The findings went to Product and the recommendations were direct: simplify the mobile profile setup flow, reduce required fields to match desktop, and add a progress indicator so users could see how close they were to completion. A secondary recommendation was a re-engagement sequence for users who completed first login but had not finished profile setup within 48 hours.</p>
+    <p class="prose">The metrics framework also gave the team something it did not have before: a consistent weekly signal. Every Monday, leadership had a dashboard showing activation rates by product, platform, and segment — with automated alerts when any metric moved more than 5% in either direction.</p>
+
+    <div class="chart-wrap">
+      <div class="chart-title">30-Day User Retention: Pre vs Post Framework Cohorts</div>
+      <canvas id="retentionChart" height="280"></canvas>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:rgba(224,112,112,0.7)"></div>Pre-framework cohort</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Post-framework cohort</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY FINDINGS -->
+  <div class="section">
+    <div class="section-label">07 / Key Findings</div>
+    <h2>What the data showed</h2>
+    <div class="finding">
+      <span class="finding-num">Finding 01</span>
+      <div class="finding-text"><strong>Full activation rate tripled</strong> from 14.5% pre-framework to 44.6% post-framework. The largest single driver was the mobile profile completion fix, which removed friction at the highest-dropout step in the funnel.</div>
+    </div>
+    <div class="finding">
+      <span class="finding-num">Finding 02</span>
+      <div class="finding-text"><strong>Small practices were the most underserved segment.</strong> At 13.6% pre-framework activation they represented 50% of users but received almost none of the onboarding investment. Post-framework, targeted re-engagement lifted their rate to 38%.</div>
+    </div>
+    <div class="finding">
+      <span class="finding-num">Finding 03</span>
+      <div class="finding-text"><strong>The mobile gap was invisible without instrumentation.</strong> Nobody knew mobile profile completion lagged desktop by 2 points because nobody had ever compared them. Cross-platform visibility was itself a product of the framework.</div>
+    </div>
+    <div class="finding">
+      <span class="finding-num">Finding 04</span>
+      <div class="finding-text"><strong>Month-12 retention improved from 30% to 57%.</strong> Users who completed the full activation sequence were significantly more likely to still be active a year later, confirming that activation quality predicted long-term retention.</div>
+    </div>
+  </div>
+
+  <!-- OUTCOME BOX -->
+  <div class="section">
+    <div class="outcome-box">
+      <div class="section-label">The Takeaway</div>
+      <h2>What this work actually was</h2>
+      <p class="prose" style="margin-bottom:1.25rem;">This was not a dashboard project. It was an alignment project that happened to produce dashboards. The most important work was the conversations that established a shared definition of success before a single query ran. Once the team agreed on what activation meant, everything else followed from that.</p>
+      <p class="prose" style="margin-bottom:1.25rem;">The 5x adoption increase is the headline number. The less visible outcome is that for the first time, Product, Marketing, and Finance were looking at the same metrics every week and having the same conversations. That organizational alignment was worth as much as any individual insight the data produced.</p>
+      <p class="prose" style="margin-bottom:0;">Note: All data shown is synthetic and generated for illustrative purposes. The analytical approach, funnel structure, and business outcomes reflect the actual work. Specific figures have been modeled to preserve confidentiality.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p><a href="index.html">Back to Portfolio</a> &nbsp;|&nbsp; <a href="awards.html">Case Study 1: Awards Analytics</a></p>
+  <p>Zack Russell &copy; 2026</p>
+</footer>
+
+<script>
+const C = {
+  teal:'#3ecfb2', accent:'#f0c96e', red:'#e07070',
+  muted:'#7a8c82', border:'#242924', text:'#e8ede9',
+  bg2:'#131614', bg3:'#1a1d1b', bg:'#0d0f0e'
+};
+
+const STEPS = ['Account\nCreated','First\nLogin','Profile\nCompleted','First\nSearch','Content\nViewed','Bookmark\nCreated','Return\nVisit 7d'];
+const PRE  = [100, 87.3, 63.0, 49.9, 40.6, 23.1, 14.5];
+const POST = [100, 93.4, 78.1, 71.7, 65.6, 52.0, 44.6];
+
+// FUNNEL CHART
+function drawFunnel() {
+  const canvas = document.getElementById('funnelChart');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.getBoundingClientRect().width || 700;
+  const H = 320;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const n = STEPS.length;
+  const pad = {l:44,r:16,t:24,b:56};
+  const chartW = W - pad.l - pad.r;
+  const chartH = H - pad.t - pad.b;
+  const groupW = chartW / n;
+  const barW = groupW * 0.3;
+
+  [0,25,50,75,100].forEach(v => {
+    const y = pad.t + chartH*(1-v/100);
+    ctx.beginPath(); ctx.strokeStyle = v===0?C.muted:C.border; ctx.lineWidth=0.5;
+    ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.fillStyle=C.muted; ctx.font='9px DM Mono,monospace'; ctx.textAlign='right';
+    ctx.fillText(v+'%',pad.l-4,y+3);
+  });
+
+  STEPS.forEach((step, i) => {
+    const cx = pad.l + i*groupW + groupW/2;
+    // Pre bar
+    const h1 = chartH * PRE[i] / 100;
+    ctx.fillStyle = 'rgba(224,112,112,0.65)';
+    ctx.fillRect(cx-barW-2, pad.t+chartH-h1, barW, h1);
+    // Post bar
+    const h2 = chartH * POST[i] / 100;
+    ctx.fillStyle = C.teal;
+    ctx.fillRect(cx+2, pad.t+chartH-h2, barW, h2);
+    // Labels
+    ctx.fillStyle = 'rgba(224,112,112,0.9)';
+    ctx.font = '8px DM Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(PRE[i]+'%', cx-barW/2-2, pad.t+chartH-h1-4);
+    ctx.fillStyle = C.teal;
+    ctx.fillText(POST[i]+'%', cx+barW/2+2, pad.t+chartH-h2-4);
+    // Step label
+    const lines = step.split('\n');
+    ctx.fillStyle = C.muted; ctx.font='9px DM Mono,monospace';
+    lines.forEach((l,li) => ctx.fillText(l, cx, H-pad.b+14+(li*11)));
+  });
+}
+
+// SEGMENT CHART
+function drawSegment() {
+  const canvas = document.getElementById('segmentChart');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.getBoundingClientRect().width || 340;
+  const H = 240;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const data = [{label:'Small\nPractice',val:13.6},{label:'Mid\nPractice',val:14.2},{label:'Large\nPractice',val:19.3}];
+  const pad = {l:44,r:16,t:20,b:48};
+  const chartW = W-pad.l-pad.r;
+  const chartH = H-pad.t-pad.b;
+  const barW = chartW/data.length*0.5;
+  const gap = chartW/data.length;
+
+  [0,10,20].forEach(v => {
+    const y = pad.t+chartH*(1-v/25);
+    ctx.beginPath(); ctx.strokeStyle=v===0?C.muted:C.border; ctx.lineWidth=0.5;
+    ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.fillStyle=C.muted; ctx.font='9px DM Mono,monospace'; ctx.textAlign='right';
+    ctx.fillText(v+'%',pad.l-4,y+3);
+  });
+
+  data.forEach((d,i) => {
+    const x = pad.l+i*gap+(gap-barW)/2;
+    const bh = chartH*d.val/25;
+    const y = pad.t+chartH-bh;
+    ctx.fillStyle = C.teal; ctx.globalAlpha=0.7+i*0.15;
+    ctx.fillRect(x,y,barW,bh);
+    ctx.globalAlpha=1;
+    ctx.fillStyle=C.text; ctx.font='bold 10px DM Mono,monospace'; ctx.textAlign='center';
+    ctx.fillText(d.val+'%',x+barW/2,y-5);
+    const lines=d.label.split('\n');
+    ctx.fillStyle=C.muted; ctx.font='9px DM Mono,monospace';
+    lines.forEach((l,li)=>ctx.fillText(l,x+barW/2,H-pad.b+12+(li*10)));
+  });
+}
+
+// PLATFORM CHART
+function drawPlatform() {
+  const canvas = document.getElementById('platformChart');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.getBoundingClientRect().width || 340;
+  const H = 240;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const data = [
+    {label:'Mobile',profile:62.2,activated:13.3},
+    {label:'Desktop',profile:64.1,activated:16.1}
+  ];
+  const pad = {l:44,r:16,t:20,b:36};
+  const chartW = W-pad.l-pad.r;
+  const chartH = H-pad.t-pad.b;
+  const groupW = chartW/2;
+  const barW = groupW*0.3;
+
+  [0,25,50,75,100].forEach(v=>{
+    const y=pad.t+chartH*(1-v/100);
+    ctx.beginPath();ctx.strokeStyle=v===0?C.muted:C.border;ctx.lineWidth=0.5;
+    ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    ctx.fillStyle=C.muted;ctx.font='9px DM Mono,monospace';ctx.textAlign='right';
+    ctx.fillText(v+'%',pad.l-4,y+3);
+  });
+
+  data.forEach((d,i)=>{
+    const cx = pad.l+i*groupW+groupW/2;
+    const h1 = chartH*d.profile/100;
+    ctx.fillStyle='rgba(62,207,178,0.4)';
+    ctx.fillRect(cx-barW-2,pad.t+chartH-h1,barW,h1);
+    ctx.fillStyle=C.muted;ctx.font='8px DM Mono,monospace';ctx.textAlign='center';
+    ctx.fillText(d.profile+'%',cx-barW/2-2,pad.t+chartH-h1-4);
+    const h2=chartH*d.activated/100;
+    ctx.fillStyle=C.teal;
+    ctx.fillRect(cx+2,pad.t+chartH-h2,barW,h2);
+    ctx.fillStyle=C.teal;ctx.font='8px DM Mono,monospace';
+    ctx.fillText(d.activated+'%',cx+barW/2+2,pad.t+chartH-h2-4);
+    ctx.fillStyle=C.muted;ctx.font='10px DM Mono,monospace';
+    ctx.fillText(d.label,cx,H-pad.t+4);
+  });
+}
+
+// RETENTION CHART
+function drawRetention() {
+  const canvas = document.getElementById('retentionChart');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.getBoundingClientRect().width || 700;
+  const H = 280;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.width = W+'px'; canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const months = [1,2,3,4,5,6,7,8,9,10,11,12];
+  const pre  = [100,72,61,54,48,44,40,37,35,33,31,30];
+  const post = [100,88,80,75,71,68,65,63,61,60,58,57];
+  const pad = {l:44,r:20,t:20,b:36};
+  const chartW = W-pad.l-pad.r;
+  const chartH = H-pad.t-pad.b;
+  const n = months.length;
+
+  [0,25,50,75,100].forEach(v=>{
+    const y=pad.t+chartH*(1-v/100);
+    ctx.beginPath();ctx.strokeStyle=v===0?C.muted:C.border;ctx.lineWidth=0.5;
+    ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();
+    ctx.fillStyle=C.muted;ctx.font='9px DM Mono,monospace';ctx.textAlign='right';
+    ctx.fillText(v+'%',pad.l-4,y+3);
+  });
+
+  // Area fills
+  const drawArea = (data, color, alpha) => {
+    ctx.beginPath();
+    data.forEach((v,i)=>{
+      const x=pad.l+(i/(n-1))*chartW;
+      const y=pad.t+chartH*(1-v/100);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.lineTo(pad.l+chartW,pad.t+chartH);
+    ctx.lineTo(pad.l,pad.t+chartH);
+    ctx.closePath();
+    ctx.fillStyle=color;ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;
+  };
+
+  drawArea(pre,'rgba(224,112,112,1)',0.15);
+  drawArea(post,'rgba(62,207,178,1)',0.15);
+
+  // Lines
+  const drawLine = (data, color) => {
+    ctx.beginPath();
+    data.forEach((v,i)=>{
+      const x=pad.l+(i/(n-1))*chartW;
+      const y=pad.t+chartH*(1-v/100);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();
+    data.forEach((v,i)=>{
+      const x=pad.l+(i/(n-1))*chartW;
+      const y=pad.t+chartH*(1-v/100);
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+      ctx.fillStyle=color;ctx.fill();
+    });
+  };
+
+  drawLine(pre,'rgba(224,112,112,0.9)');
+  drawLine(post,C.teal);
+
+  months.forEach((m,i)=>{
+    if(i%2===0){
+      const x=pad.l+(i/(n-1))*chartW;
+      ctx.fillStyle=C.muted;ctx.font='9px DM Mono,monospace';ctx.textAlign='center';
+      ctx.fillText('M'+m,x,H-8);
+    }
+  });
+}
+
+requestAnimationFrame(()=>{
+  drawFunnel();
+  drawSegment();
+  drawPlatform();
+  drawRetention();
+});
+</script>
+</body>
+</html>
